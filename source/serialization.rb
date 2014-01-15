@@ -1,4 +1,5 @@
 require 'csv'
+require 'date'
 
 class Person
   attr_reader :id, :first_name, :last_name, :email, :phone, :created_at
@@ -21,9 +22,8 @@ class PersonParser
   end
 
   def people
-  # @people = [] # reset people
    CSV.foreach(@file, :headers => true) do |row|
-      @people << Person.new(row['id'], row['first_name'], row['last_name'], row['email'], row['phone'], row['created_at'])
+      @people << Person.new(row['id'], row['first_name'], row['last_name'], row['email'], row['phone'], DateTime.parse(row['created_at']))
     end
     return @people if @people
   end
@@ -43,12 +43,12 @@ class PersonParser
   end
 end
 
-
+# Driver Code
 parser = PersonParser.new('people.csv')
-david = Person.new(201,"David","Goodman","rickismybestfriend@gmail.com","516726736","76239873268235867")
+david = Person.new(201,"David","Goodman","rickismybestfriend@gmail.com","516726736","2013-01-24T02:20:11-08:00")
 parser.add_person(david)
 parser.save
-rick = Person.new(202,"Ricardo","Rubio","davidisbestbuddyforever@aol.com","123726736","37629873268235867")
+rick = Person.new(202,"Ricardo","Rubio","davidisbestbuddyforever@aol.com","123726736","2013-08-20T22:24:59-07:00")
 parser.add_person(rick)
 puts "----------------------"
 parser.save
