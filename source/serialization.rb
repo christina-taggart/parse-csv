@@ -20,10 +20,10 @@ class PersonParser
   def initialize(file)
     @file = file
     @people = nil
-    get_people
+    get_people_from_csv
   end
 
-  def get_people
+  def get_people_from_csv
     # If we've already parsed the CSV file, don't parse it again.
     # Remember: @people is +nil+ by default.
     return @people if @people
@@ -35,14 +35,21 @@ class PersonParser
     CSV.foreach(file) do |row|
       @people << Person.new(row)
     end
+    @people.shift
   end
 
-  def add_person
-
+  def add_person(person_array)
+    last_id = @people.last.id
+    person_array.unshift((last_id.to_i + 1).to_s)
+    person = Person.new(person_array)
+    @people << person
   end
 end
 
 parser = PersonParser.new('./people.csv')
 p parser.people
 
+parser.add_person(['Taggart','Christina','hello@Duis.edu','1-400-270-2222','2013-06-27T17:59:41-07:00'])
+
+p parser.people.last
 # puts "There are #{parser.people.size} people in the file '#{parser.file}'."
