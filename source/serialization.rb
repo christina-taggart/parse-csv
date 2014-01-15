@@ -1,4 +1,5 @@
 require 'csv'
+require 'date'
 
 class Person
 
@@ -28,10 +29,14 @@ class PersonParser
 
   def people
     @people = []
+    name_flag = true
     CSV.foreach(file) do |row|
-      @people << Person.new(row[0], row[1], row[2], row[3], row[4], row[5])
+      if name_flag
+        name_flag = false
+        next
+      end
+      @people << Person.new(row[0], row[1], row[2], row[3], row[4], DateTime.parse(row[5]))
     end
-    @people.shift
     @people if @people
   end
 
@@ -55,7 +60,7 @@ class PersonParser
 end
 
 parser = PersonParser.new('people.csv')
-parser.people
+p parser.people
 parser.add_person("Eli", "Shkurkin", "yomama@whut.com", "555-555-5555", Time.now)
 p parser.staged_to_add
 puts "There are #{parser.people.size} people in the file '#{parser.file}'."
