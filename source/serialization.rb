@@ -1,4 +1,5 @@
 require 'csv'
+require 'date'
 
 class Person
   attr_reader :id, :first_name, :last_name, :email, :phone, :created_at
@@ -8,7 +9,7 @@ class Person
     @last_name = person_array[2]
     @email = person_array[3]
     @phone = person_array[4]
-    @created_at = person_array[5]
+    @created_at = DateTime.parse(person_array[5])
   end
   # Look at the above CSV file
   # What attributes should a Person object have?
@@ -33,6 +34,7 @@ class PersonParser
     # Array in the @people instance variable.
     @people = []
     CSV.foreach(file) do |row|
+      next if $. == 1
       @people << Person.new(row)
     end
     @people.shift
@@ -51,5 +53,5 @@ p parser.people
 
 parser.add_person(['Taggart','Christina','hello@Duis.edu','1-400-270-2222','2013-06-27T17:59:41-07:00'])
 
-p parser.people.last
+p parser.people.last.created_at
 # puts "There are #{parser.people.size} people in the file '#{parser.file}'."
