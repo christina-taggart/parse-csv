@@ -1,13 +1,15 @@
 require 'csv'
+require 'date'
 
 class Person
+  attr_reader :id, :first_name, :last_name, :email, :phone, :created_at
   def initialize(hash)
     @id = hash['id']
     @first_name = hash['first_name']
     @last_name = hash['last_name']
     @email = hash['email']
     @phone = hash['phone']
-    @created_at = hash['created_at']
+    @created_at = DateTime.parse(hash['created_at'])
   end
 
   def to_a
@@ -57,6 +59,7 @@ parser = PersonParser.new('people.csv')
 parser.people
 p parser.people.size == 200
 
+#testing PersonParser#add_person
 molly_info = {
   "id" => 201,
   "first_name" => "Molly",
@@ -68,4 +71,8 @@ molly_info = {
 parser.add_person(Person.new(molly_info))
 p parser.people.size == 201
 
+#testing PersonParser#save
 parser.save
+
+#testing if created_at is a DateTime object
+puts parser.people[0].created_at.class == DateTime
