@@ -1,4 +1,6 @@
 require 'csv'
+require 'pry'
+require 'pry-nav'
 
 class Person
   attr_reader :id, :first_name, :last_name, :email, :phone, :created_at
@@ -13,28 +15,26 @@ class Person
 end
 
 class PersonParser
-  attr_reader :file
-
+  attr_reader :file, :people
   def initialize(file)
     @file = file
-    @people = []
+    @people = nil
   end
 
   def people
-    source_file = CSV.read(@file)
-    source_file.each do |row|
-      @people << Person.new(row[0], row[1], row[2], row[3], row[4], row[5])
-    end
     # If we've already parsed the CSV file, don't parse it again.
     # Remember: @people is +nil+ by default.
-    return @people if @people
-
+    @people = []
     # We've never called people before, now parse the CSV file
     # and return an Array of Person objects here.  Save the
     # Array in the @people instance variable.
+     CSV.foreach(@file, :headers => true) do |row|
+        @people << Person.new(row['id'], row['first_name'], row['last_name'], row['email'], row['phone'], row['created_at'])
+      end
+    return @people if @people
   end
 end
 
 parser = PersonParser.new('people.csv')
-parser.people
+p parser.people
 puts "There are #{parser.people.size} people in the file '#{parser.file}'."
