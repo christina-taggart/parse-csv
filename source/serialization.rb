@@ -1,13 +1,13 @@
 require 'csv'
 
 class Person
-  def initialize(table)
-    @id = table['id']
-    @first_name = table['first_name']
-    @last_name = table['last_name']
-    @email = table['email']
-    @phone = table['phone']
-    @created_at = table['created_at']
+  def initialize(hash)
+    @id = hash['id']
+    @first_name = hash['first_name']
+    @last_name = hash['last_name']
+    @email = hash['email']
+    @phone = hash['phone']
+    @created_at = hash['created_at']
   end
 end
 
@@ -21,10 +21,14 @@ class PersonParser
 
   def people
     return @people if @people
-    @people = Array.new
-    CSV.foreach(@file, :headers => true) do |table|
-      @people << Person.new(table)
+    @people = []
+    CSV.foreach(@file, :headers => true) do |row_hash|
+      @people << Person.new(row_hash)
     end
+  end
+
+  def add_person(person)
+    @people << person
   end
 end
 
@@ -33,4 +37,15 @@ end
 
 parser = PersonParser.new('people.csv')
 parser.people
-puts "There are #{parser.people.size} people in the file '#{parser.file}'."
+p parser.people.size == 200
+
+molly_info = {
+  "id" => 201,
+  "first_name" => "Molly",
+  "last_name" => "Harris",
+  "email" => "molly.harris@email.com",
+  "phone" => "123-456-7890",
+  "created_at" => "2013-12-02T07:45:30-08:00"
+}
+parser.add_person(Person.new(molly_info))
+p parser.people.size == 201
