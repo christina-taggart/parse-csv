@@ -39,9 +39,32 @@ class PersonParser
     @people.delete_at(0)
     @people
   end
+
+  def add_person(new_person)
+    @people << new_person
+  end
+
+  def save!
+    CSV.open('people.csv', "wb") do |csv|
+      csv << "id,first_name,last_name,email,phone,created_at".split(",")
+      @people.each do |person|
+        text_row = [person.id, person.first_name, person.last_name, person.email, person.phone, person.created_at]
+        csv << text_row
+      end
+    end
+  end
 end
 
 parser = PersonParser.new('people.csv')
 
 puts "There are #{parser.people.size} people in the file '#{parser.file}'."
 puts "The first person is #{parser.people.first.first_name} #{parser.people.first.last_name}."
+
+michael_jordan = Person.new("230", "Michael", "Jordan", "hoops@nba.com", "123-555-3333", "2013-07-06T07:23:09-07:00")
+parser.add_person(michael_jordan)
+
+puts "There are #{parser.people.size} people after add_person."
+puts "The last person added is #{parser.people.last.first_name} #{parser.people.last.last_name}."
+
+parser.save!
+
