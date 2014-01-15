@@ -1,4 +1,5 @@
 require 'csv'
+require 'date'
 
 class Person
   attr_reader :id, :first_name, :last_name, :email, :phone, :created_at
@@ -11,7 +12,7 @@ class Person
     @last_name = last_name
     @email = email
     @phone = phone
-    @created_at = created_at
+    @created_at = DateTime.parse(created_at)
   end
 end
 
@@ -32,11 +33,15 @@ class PersonParser
     # and return an Array of Person objects here.  Save the
     # Array in the @people instance variable.
     @people = []
+    is_first_line = true
     CSV.foreach("people.csv") do |row|
-      new_person = Person.new(row[0], row[1], row[2], row[3], row[4], row[5])
-      @people << new_person
+      unless is_first_line
+        new_person = Person.new(row[0], row[1], row[2], row[3], row[4], row[5])
+        @people << new_person
+      else
+        is_first_line = false
+      end
     end
-    @people.delete_at(0)
     @people
   end
 
@@ -48,7 +53,7 @@ class PersonParser
     CSV.open('people.csv', "wb") do |csv|
       csv << "id,first_name,last_name,email,phone,created_at".split(",")
       @people.each do |person|
-        text_row = [person.id, person.first_name, person.last_name, person.email, person.phone, person.created_at]
+        text_row = [person.id, person.first_name, person.last_name, person.email, person.phone, person.created_at.to_s]
         csv << text_row
       end
     end
@@ -59,6 +64,7 @@ parser = PersonParser.new('people.csv')
 
 puts "There are #{parser.people.size} people in the file '#{parser.file}'."
 puts "The first person is #{parser.people.first.first_name} #{parser.people.first.last_name}."
+puts "The first person was created_at #{parser.people.first.created_at}."
 
 michael_jordan = Person.new("230", "Michael", "Jordan", "hoops@nba.com", "123-555-3333", "2013-07-06T07:23:09-07:00")
 parser.add_person(michael_jordan)
@@ -66,5 +72,6 @@ parser.add_person(michael_jordan)
 puts "There are #{parser.people.size} people after add_person."
 puts "The last person added is #{parser.people.last.first_name} #{parser.people.last.last_name}."
 
+puts "saving!"
 parser.save!
 
