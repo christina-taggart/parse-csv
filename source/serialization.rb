@@ -9,7 +9,12 @@ class Person
     @phone = hash['phone']
     @created_at = hash['created_at']
   end
+
+  def to_a
+    [@id, @first_name, @last_name, @email, @phone, @created_at]
+  end
 end
+
 
 class PersonParser
   attr_reader :file
@@ -30,6 +35,19 @@ class PersonParser
   def add_person(person)
     @people << person
   end
+
+  def save
+    CSV.open("updated_people.csv", "w") do |csv|
+      unparse_people(csv)
+    end
+  end
+
+  def unparse_people(csv)
+    csv << ['id', 'first_name', 'last_name', 'email', 'phone', 'created_at']
+    @people.each do |person|
+      csv << person.to_a
+    end
+  end
 end
 
 
@@ -49,3 +67,5 @@ molly_info = {
 }
 parser.add_person(Person.new(molly_info))
 p parser.people.size == 201
+
+parser.save
